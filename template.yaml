@@ -118,6 +118,7 @@ Resources:
           storage__s3__bucket: !Ref Bucket
           storage__s3__secretAccessKey: !GetAtt AccessKey.SecretAccessKey
           storage__s3__pathPrefix: assets
+          storage__s3__acl: bucket-owner-full-control
           url: !Sub https://${DomainName}
       FileSystemConfigs:
         - Arn: !GetAtt ContentAp.Arn
@@ -126,7 +127,7 @@ Resources:
       Layers:
         - !Ref NodeModules
       MemorySize: !Ref Memory
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       VpcConfig:
         SecurityGroupIds:
           - !Ref FnSg
@@ -181,7 +182,7 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       CompatibleRuntimes:
-        - nodejs12.x
+        - nodejs16.x
       ContentUri: ./node-modules.zip
       RetentionPolicy: Delete
 
@@ -237,22 +238,33 @@ Resources:
     Properties:
       DatabaseName: !FindInMap [Constants, Values, DatabaseName]
       DBSubnetGroupName: !Ref SubnetGroup
-      DeletionProtection: true
+      #DeletionProtection: true
       EnableHttpEndpoint: true
-      Engine: aurora
-      EngineMode: serverless
+      Engine: aurora-mysql
+      #EngineMode: serverless
       MasterUsername: !FindInMap [Constants, Values, DatabaseUser]
       MasterUserPassword: !Ref DatabasePassword
-      ScalingConfiguration:
-        AutoPause: true
-        MinCapacity: 1
-        MaxCapacity: 1
-        SecondsUntilAutoPause: 3600
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: !Ref MinCapacity
+        MaxCapacity: !Ref MaxCapacity
+      #ScalingConfiguration:
+      #  AutoPause: true
+      #  MinCapacity: 1
+      #  MaxCapacity: 1
+      #  SecondsUntilAutoPause: 3600
       Tags:
         - Key: Project
           Value: !Ref AWS::StackName
       VpcSecurityGroupIds:
         - !Ref DbSg
+  
+  ServerlessDbInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Condition: isServerless
+    Properties:
+      Engine: aurora-mysql
+      DBInstanceClass: db.serverless
+      DBClusterIdentifier: !Ref RDSDBCluster
 
   Db:
     Type: AWS::RDS::DBInstance

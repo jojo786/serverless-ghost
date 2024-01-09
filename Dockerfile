@@ -11,13 +11,13 @@ RUN mv /tmp/node_modules/ghost-storage-adapter-s3/ core/server/adapters/storage/
 
 FROM python:3.8-alpine
 
-RUN apk add --no-cache gcc musl-dev patch zip
+RUN apk add --no-cache gcc musl-dev patch zip libffi-dev 
 
 ENV SAM_CLI_TELEMETRY 0
 
 WORKDIR /app
 
-RUN pip3 install "aws-sam-cli<1" awscli
+RUN pip3 install aws-sam-cli awscli
 
 COPY --from=base /var/lib/ghost/versions/3.20.1/ src
 

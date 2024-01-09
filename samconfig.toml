@@ -4,5 +4,5 @@ version = 0.1
 [default.deploy.parameters]
 s3_prefix = "serverless-ghost"
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "DomainName=\"\" EnableDebugLogs=\"true\" EnableNat=\"false\" UseServerlessDb=\"true\" SentryDsn=\"\" SesSmtpPassword=\"\""
-
+region = "af-south-1"
+parameter_overrides = "DomainName=\"blog.hacksaw.co.za\" EnableDebugLogs=\"true\" EnableNat=\"true\" UseServerlessDb=\"true\" SentryDsn=\"\" SesSmtpPassword=\"\""
